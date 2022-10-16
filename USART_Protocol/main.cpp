@@ -8,43 +8,32 @@
 #define F_CPU 16000000L
 
 #include <avr/io.h>
+#include <util/delay.h>
+#include "serial.h"
 
-void begin(unsigned int baudRate);
-void wait() ;
-void write(char byte);
-char read();
+Serial serial;
 
 int main(void)
 {
-	begin(9600);
+	serial.begin(9600);
+	
+	serial.println("AVR C Compiler Data Sizes Are:");
+	serial.print("int   : "); serial.println((int)sizeof(int));
+	serial.print("long  : "); serial.println((int)sizeof(long));
+	serial.print("float : "); serial.println((int)sizeof(float));
+	serial.print("double: "); serial.println((int)sizeof(double));
+	
 	while (1)
 	{
-		char data = read();
-		write(data);
+		if (serial.available())
+		{
+			char data = '\0';
+			while(data != '\n')
+			{
+				data = serial.read();
+				serial.write(data);
+			}
+		}
+		
 	}
-}
-
-void begin(unsigned int baudRate)
-{
-	unsigned int ubrrRegValue = (unsigned int)((F_CPU / (8L * baudRate)) - 1L);
-	UBRRH = (unsigned char) ubrrRegValue >> 8;
-	UBRRL = (unsigned char) ubrrRegValue;
-	UCSRA |= (1 << U2X);
-	UCSRB |= (1 << RXEN) | (1 << TXEN);
-	UCSRC |= (1 << URSEL) | (1 << UCSZ1) | (1 << UCSZ0);
-}
-
-void wait() 
-{
-	while(!(UCSRA & (1 << RXC)));
-}
-
-void write(char byte) {
-	while(!(UCSRA & (1 << UDRE)));
-	UDR = byte;
-}
-
-char read() {
-	wait();
-	return UDR;
 }
