@@ -9,7 +9,7 @@
 
 #include <avr/io.h>
 
-void begin(unsigned int baudRate);
+void begin(unsigned long baudRate);
 void wait() ;
 void write(char byte);
 char read();
@@ -24,7 +24,7 @@ int main(void)
 	}
 }
 
-void begin(unsigned int baudRate)
+void begin(unsigned long baudRate)
 {
 	unsigned int ubrrRegValue = (unsigned int)((F_CPU / (8L * baudRate)) - 1L); // calculate baud rate register value
 	UBRRH = (unsigned char) ubrrRegValue >> 8;
